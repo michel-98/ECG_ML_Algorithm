@@ -1,0 +1,5 @@
+﻿.idea
+simulation-pytorch/venv
+simulation-pytorch/__pycache__
+simulation-pytorch/runs
+simulation-pytorch/MIT-BIH-DataSet
