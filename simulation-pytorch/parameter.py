@@ -4,6 +4,7 @@ from datetime import datetime
 
 from keras import Sequential
 from keras.src.layers import LSTM, Dense
+import traceback
 
 from parameter import *
 
@@ -29,14 +30,15 @@ parser.add_argument(
 )
 parser.add_argument("--num_rounds", type=int, default=10, help="Number of FL rounds.")
 
-NUM_CLIENTS = 10
+NUM_CLIENTS = 3
 VERBOSE = 0
 
 
 def get_model(train_features):
     """Constructs a simple model architecture suitable for MNIST."""
+    traceback.print_exc()
 
-    input_shape = train_features.shape[1]
+    input_shape = train_features.shape[2]
 
     model = Sequential()
     model.add(LSTM(128, input_shape=(2, input_shape)))

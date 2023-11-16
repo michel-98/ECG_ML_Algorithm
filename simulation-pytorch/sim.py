@@ -2,14 +2,14 @@ import math
 from typing import Dict, List, Tuple
 
 import flwr as fl
-import tensorflow as tf
 from flwr.common import Metrics
 from flwr.simulation.ray_transport.utils import enable_tf_gpu_growth
 
+from ECG import preprocess_data
 from flower_client import FlowerClient
 from parameter import *
 
-from ECG import preprocess_data
+
 def get_client_fn(dataset_partitions):
     """Return a function to construc a client.
 
@@ -35,6 +35,7 @@ def get_client_fn(dataset_partitions):
 
     return client_fn
 
+
 def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     """Aggregation function for (federated) evaluation metrics.
 
@@ -58,7 +59,7 @@ def get_evaluate_fn(testset):
             parameters: fl.common.NDArrays,
             config: Dict[str, fl.common.Scalar],
     ):
-        model = get_model(testset)  # Construct the model
+        model = get_model(x_test)  # Construct the model
         model.set_weights(parameters)  # Update model with the latest parameters
         loss, accuracy = model.evaluate(x_test, y_test, verbose=VERBOSE)
         return loss, {"accuracy": accuracy}
@@ -66,14 +67,25 @@ def get_evaluate_fn(testset):
     return evaluate
 
 
+def partition(x_train, y_train, features_test):
+    """Download and partitions the MNIST dataset."""
+    partitions = []
+    # We keep all partitions equal-sized in this example
+    partition_size = math.floor(len(x_train) / NUM_CLIENTS)
+    for cid in range(NUM_CLIENTS):
+        # Split dataset into non-overlapping NUM_CLIENT partitions
+        idx_from, idx_to = int(cid) * partition_size, (int(cid) + 1) * partition_size
+        partitions.append((x_train[idx_from:idx_to] / 255.0, y_train[idx_from:idx_to]))
+    return partitions, features_test
+
+
 def main() -> None:
     # Parse input arguments
     args = parser.parse_args()
 
     # Create dataset partitions (needed if your dataset is not pre-partitioned)
-    split_train_features, features_test = preprocess_data()
-
-
+    x_train, y_train, features_test = preprocess_data()
+    partitions, testset = partition(x_train, y_train, features_test)
 
     # Create FedAvg strategy
     strategy = fl.server.strategy.FedAvg(
@@ -85,7 +97,7 @@ def main() -> None:
             NUM_CLIENTS * 0.75
         ),  # Wait until at least 75 clients are available
         evaluate_metrics_aggregation_fn=weighted_average,  # aggregates federated metrics
-        evaluate_fn=get_evaluate_fn(features_test),  # global evaluation function
+        evaluate_fn=get_evaluate_fn(testset),  # global evaluation function
     )
 
     # With a dictionary, you tell Flower's VirtualClientEngine that each
@@ -97,9 +109,9 @@ def main() -> None:
 
     # Start simulation
     fl.simulation.start_simulation(
-        client_fn=get_client_fn(split_train_features),
+        client_fn=get_client_fn(partitions),
         num_clients=NUM_CLIENTS,
-        config=fl.server.ServerConfig(num_rounds=10),
+        config=fl.server.ServerConfig(num_rounds=20),
         strategy=strategy,
         client_resources=client_resources,
         actor_kwargs={

@@ -7,7 +7,7 @@ from parameter import *
 class FlowerClient(fl.client.NumPyClient):
     def __init__(self, x_train, y_train, x_val, y_val) -> None:
         # Create model
-        self.model = get_model()
+        self.model = get_model(x_train)
         self.x_train, self.y_train = x_train, y_train
         self.x_val, self.y_val = x_val, y_val
 
