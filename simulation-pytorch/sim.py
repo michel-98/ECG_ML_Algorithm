@@ -91,11 +91,9 @@ def main() -> None:
     strategy = fl.server.strategy.FedAvg(
         fraction_fit=0.1,  # Sample 10% of available clients for training
         fraction_evaluate=0.05,  # Sample 5% of available clients for evaluation
-        min_fit_clients=10,  # Never sample less than 10 clients for training
-        min_evaluate_clients=5,  # Never sample less than 5 clients for evaluation
-        min_available_clients=int(
-            NUM_CLIENTS * 0.75
-        ),  # Wait until at least 75 clients are available
+        min_fit_clients=3,  # Never sample less than 10 clients for training
+        min_evaluate_clients=3,  # Never sample less than 5 clients for evaluation
+        min_available_clients=3,
         evaluate_metrics_aggregation_fn=weighted_average,  # aggregates federated metrics
         evaluate_fn=get_evaluate_fn(testset),  # global evaluation function
     )
@@ -111,7 +109,7 @@ def main() -> None:
     fl.simulation.start_simulation(
         client_fn=get_client_fn(partitions),
         num_clients=NUM_CLIENTS,
-        config=fl.server.ServerConfig(num_rounds=20),
+        config=fl.server.ServerConfig(num_rounds=10),
         strategy=strategy,
         client_resources=client_resources,
         actor_kwargs={
