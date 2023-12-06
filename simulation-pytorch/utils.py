@@ -52,32 +52,3 @@ def train(net, trainloader, optim, epochs):
         epoch_loss = running_loss / len(trainloader)
 
         return epoch_loss, accuracy
-
-
-# borrowed from Pytorch quickstart example
-def test(net, testloader):
-    """Validate the network on the entire test set."""
-    criterion = torch.nn.CrossEntropyLoss()
-    correct, loss = 0, 0.0
-    net.eval()
-    with torch.no_grad():
-        for data in testloader:
-            outputs = net(images)
-            loss += criterion(outputs, labels).item()
-            _, predicted = torch.max(outputs.data, 1)
-            correct += (predicted == labels).sum().item()
-    accuracy = correct / len(testloader.dataset)
-    return loss, accuracy
-
-
-def get_mnist(data_path: str = "./data"):
-    """Download MNIST and apply transform."""
-
-    # transformation to convert images to tensors and apply normalization
-    tr = Compose([ToTensor(), Normalize((0.1307,), (0.3081,))])
-
-    # prepare train and test set
-    trainset = MNIST(data_path, train=True, download=True, transform=tr)
-    testset = MNIST(data_path, train=False, download=True, transform=tr)
-
-    return trainset, testset

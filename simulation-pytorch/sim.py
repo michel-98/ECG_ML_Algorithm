@@ -5,7 +5,7 @@ import flwr as fl
 from flwr.common import Metrics
 from flwr.simulation.ray_transport.utils import enable_tf_gpu_growth
 
-from ECG import preprocess_data
+from ECG import DataPreprocessor
 from flower_client import FlowerClient
 from parameter import *
 
@@ -80,12 +80,21 @@ def partition(x_train, y_train):
 
 
 def main() -> None:
+    run(10)
+
+
+def run(num_rounds) -> None:
     # Parse input arguments
     args = parser.parse_args()
 
     # Create dataset partitions (needed if your dataset is not pre-partitioned)
-    x_train, y_train, features_test = preprocess_data()
-    partitions = partition(x_train, y_train)
+    partitions = [DataPreprocessor([232, 222, 209, 201, 207, 118, 220, 223, 202, 234, 124]).split_data(),
+                  DataPreprocessor([100, 200, 213, 210, 114, 219, 233, 113, 108, 101, 205]).split_data(),
+                  DataPreprocessor([215, 228, 103, 112, 203, 208, 116, 117, 121, 231, 102]).split_data()]
+
+    features_test = DataPreprocessor([104, 105, 106, 217, 107, 109, 115, 221, 119, 123, 214]).get_test_data()
+
+    NUM_ROUNDS = num_rounds
 
     # Create FedAvg strategy
     strategy = fl.server.strategy.FedAvg(
