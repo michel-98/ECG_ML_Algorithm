@@ -31,6 +31,7 @@ parser.add_argument(
 parser.add_argument("--num_rounds", type=int, default=10, help="Number of FL rounds.")
 
 NUM_CLIENTS = 3
+NUM_ROUNDS = 10
 VERBOSE = 0
 
 
@@ -43,7 +44,7 @@ def get_model(train_features):
     model = Sequential()
     model.add(LSTM(128, input_shape=(2, input_shape)))
     model.add(Dense(64, activation='relu'))
-    model.add(Dense(3, activation='softmax'))  # 3 classi di output - prova sigmoid
+    model.add(Dense(4, activation='softmax'))  # 3 classi di output - prova sigmoid
 
     # Bilancia le classi
     # DO not work see it later  class_weights = class_weight.compute_class_weight('balanced', np.unique(labels), labels)

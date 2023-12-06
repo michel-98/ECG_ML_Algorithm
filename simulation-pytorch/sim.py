@@ -67,7 +67,7 @@ def get_evaluate_fn(testset):
     return evaluate
 
 
-def partition(x_train, y_train, features_test):
+def partition(x_train, y_train):
     """Download and partitions the MNIST dataset."""
     partitions = []
     # We keep all partitions equal-sized in this example
@@ -76,7 +76,7 @@ def partition(x_train, y_train, features_test):
         # Split dataset into non-overlapping NUM_CLIENT partitions
         idx_from, idx_to = int(cid) * partition_size, (int(cid) + 1) * partition_size
         partitions.append((x_train[idx_from:idx_to] / 255.0, y_train[idx_from:idx_to]))
-    return partitions, features_test
+    return partitions
 
 
 def main() -> None:
@@ -85,7 +85,7 @@ def main() -> None:
 
     # Create dataset partitions (needed if your dataset is not pre-partitioned)
     x_train, y_train, features_test = preprocess_data()
-    partitions, testset = partition(x_train, y_train, features_test)
+    partitions = partition(x_train, y_train)
 
     # Create FedAvg strategy
     strategy = fl.server.strategy.FedAvg(
@@ -95,7 +95,7 @@ def main() -> None:
         min_evaluate_clients=3,  # Never sample less than 5 clients for evaluation
         min_available_clients=3,
         evaluate_metrics_aggregation_fn=weighted_average,  # aggregates federated metrics
-        evaluate_fn=get_evaluate_fn(testset),  # global evaluation function
+        evaluate_fn=get_evaluate_fn(features_test),  # global evaluation function
     )
 
     # With a dictionary, you tell Flower's VirtualClientEngine that each
@@ -109,7 +109,7 @@ def main() -> None:
     fl.simulation.start_simulation(
         client_fn=get_client_fn(partitions),
         num_clients=NUM_CLIENTS,
-        config=fl.server.ServerConfig(num_rounds=10),
+        config=fl.server.ServerConfig(num_rounds=NUM_ROUNDS),
         strategy=strategy,
         client_resources=client_resources,
         actor_kwargs={
