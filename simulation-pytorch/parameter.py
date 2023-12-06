@@ -1,10 +1,10 @@
 import argparse
 import os
+import traceback
 from datetime import datetime
 
 from keras import Sequential
 from keras.src.layers import LSTM, Dense
-import traceback
 
 from parameter import *
 

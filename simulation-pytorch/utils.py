@@ -1,8 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchvision.datasets import MNIST
-from torchvision.transforms import ToTensor, Normalize, Compose
 
 
 # Model (simple CNN adapted from 'PyTorch: A 60 Minute Blitz')
