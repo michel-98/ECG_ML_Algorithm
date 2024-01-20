@@ -80,3 +80,4 @@ wcwidth==0.2.9
 Werkzeug==3.0.1
 yarl==1.9.2
 zipp==3.17.0
+tsaug==0.2.1
