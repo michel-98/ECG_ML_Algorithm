@@ -10,13 +10,14 @@ from parameter import *
 
 # Flower client, adapted from Pytorch quickstart example
 class FlowerClient(fl.client.NumPyClient):
-    def __init__(self, x_train, y_train, x_val, y_val, cid, knn_model: KNeighborsClassifier) -> None:
+    def __init__(self, x_train, y_train, x_val, y_val, cid, knn_model: KNeighborsClassifier, defense_strategy) -> None:
         # Create model
         self.model = get_model(x_train)
         self.x_train, self.y_train = x_train, y_train
         self.x_val, self.y_val = x_val, y_val
         self.cid = cid
         self.knn_model = knn_model
+        self.defense_strategy = defense_strategy
 
     def get_parameters(self, config):
         return self.model.get_weights()
@@ -26,13 +27,20 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         # Here you can call the specific fit method based on your requirements/configurations.
-        # For example:
-        print("Client: " + str(self.cid))
-        if True:
-            print("_________________With defense - replacement -augmentation __________________")
+        if self.defense_strategy == 0:
+            print("_________________With no defense_________________")
+            return self.fit_base(parameters)
+        elif self.defense_strategy == 1:
+            print("_________________With defense - replacement_________________")
+            return self.fit_replace(parameters)
+        elif self.defense_strategy == 2:
+            print("_________________With defense - deletion_________________")
+            return self.fit_base(parameters)
+        elif self.defense_strategy == 3:
+            print("_________________With defense - replacement + augmentation_________________")
             return self.fit_without_poisoned_features_with_data_augmentation(parameters)
         else:
-            print("_________________Without defense__________________")
+            print("_________________With no defense - ERROR  __________________")
             return self.fit_base(parameters)
 
     def fit_without_poisoned_features(self, parameters):
@@ -81,7 +89,6 @@ class FlowerClient(fl.client.NumPyClient):
         # Identify non-poisoned features (assuming a binary flag or label to identify poisoned samples)
         non_poisoned_indices = np.where(y_pred == self.y_train)[0]
         if len(non_poisoned_indices) != len(y_pred):
-            print(" Client: " + str(self.cid) + "  entrato in augmentation")
             # Filter out poisoned features
             clean_x_train = self.x_train[non_poisoned_indices]
             augmenter = (
