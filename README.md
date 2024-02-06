@@ -10,9 +10,24 @@ It uses Flower (FL) library for federated learning simulation.
 - Custom defense strategies against label flipping attacks.
 - Evaluation of federated learning performance.
 
+## Installation
+
+#### pip
+
+Write the command below in your terminal to install the dependencies according to the configuration file requirements.txt.
+
+```shell
+pip install -r requirements.txt
+```
+
+### Run Federated Learning Example
+
 ## Usage
 
-1. Run the Python script `main.py`.
+1. Run the Python script `sim.py`.
+```bash
+python sim.py
+```
 2. Enter the necessary parameters:
    - Attacked (True/False): Specifies whether the system is under attack or not.
    - Defense Strategy (0/1/2/3):

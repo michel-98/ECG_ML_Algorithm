@@ -102,7 +102,8 @@ def get_input():
         attacked_input = input("Enter 'True' if attacked, 'False' otherwise: ")
         if attacked_input in ['True', 'False']:
             attacked = (attacked_input == 'True')
-            while attacked:
+            valid_input_clients = False
+            while not valid_input_clients:
                 try:
                     clients_attacked = int(input("Enter the number of attacked clients (1-3): "))
                     if 1 <= clients_attacked <= 3:
@@ -115,10 +116,10 @@ def get_input():
                         break
                     else:
                         print("Clients attacked must be between 1 and 3.")
-                    break
                 except ValueError:
                     print("Please enter a valid integer.")
-            while attacked:
+            valid_input_defense = False
+            while not valid_input_defense:
                 try:
                     defense_strategy = int(input("Enter the defense strategy (0 for no defense, 1 for substitution, "
                                                  "2 for deletion, 3 for data augmentation): "))
@@ -128,7 +129,8 @@ def get_input():
                         print("Defense strategy must be in [0, 1, 2, 3].")
                 except ValueError:
                     print("Please enter a valid integer.")
-            while attacked:
+            valid_input_percentage = False
+            while not valid_input_percentage:
                 try:
                     attacked_percentage = float(input("Enter the attack percentage: "))
                     if 0 <= attacked_percentage <= 1:
