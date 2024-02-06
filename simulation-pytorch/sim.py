@@ -6,7 +6,6 @@ import flwr as fl
 import numpy as np
 from flwr.common import Metrics
 from flwr.simulation.ray_transport.utils import enable_tf_gpu_growth
-from matplotlib import pyplot as plt
 from sklearn.neighbors import KNeighborsClassifier
 
 from ECG import DataPreprocessor
@@ -15,9 +14,9 @@ from parameter import *
 
 
 def get_client_fn(dataset_partitions, knn_model, defense_strategy):
-    """Return a function to construc a client.
+    """Return a function to construct a client.
 
-    The VirtualClientEngine will exectue this function whenever a client is sampled by
+    The VirtualClientEngine will execute this function whenever a client is sampled by
     the strategy to participate.
     """
 
@@ -70,7 +69,7 @@ def get_evaluate_fn(testset):
 
 
 def partition(x_train, y_train):
-    """Download and partitions the MNIST dataset."""
+    """Partitions the dataset."""
     partitions = []
     # We keep all partitions equal-sized in this example
     partition_size = math.floor(len(x_train) / NUM_CLIENTS)
@@ -82,28 +81,10 @@ def partition(x_train, y_train):
 
 
 def create_global_knn(x_train, y_train) -> KNeighborsClassifier:
+    """Create and train a global KNN model."""
     knn = KNeighborsClassifier(3, weights="distance")
     knn.fit(x_train.reshape(x_train.shape[0], -1), y_train)
     return knn
-
-
-def plot_labels_comparison(y_train, y_train_predicted):
-    plt.figure(figsize=(10, 6))
-
-    plt.subplot(1, 2, 1)
-    plt.title('Original Labels (y_train)')
-    plt.hist(y_train, bins=2, color='blue', alpha=0.7)
-    plt.xlabel('Labels')
-    plt.ylabel('Count')
-
-    plt.subplot(1, 2, 2)
-    plt.title('Corrected Labels (y_train_predicted)')
-    plt.hist(y_train_predicted, bins=2, color='green', alpha=0.7)
-    plt.xlabel('Labels')
-    plt.ylabel('Count')
-
-    plt.tight_layout()
-    plt.show()
 
 
 # *defense strategies*:
@@ -113,6 +94,7 @@ def plot_labels_comparison(y_train, y_train_predicted):
 # 3: data augmentation
 ##
 def get_input():
+    """Prompt user for custom parameters."""
     while True:
         attacked_clients = []
         defense_strategy = 0
@@ -163,6 +145,7 @@ def get_input():
 
 
 def main() -> None:
+    """Main function to start the simulation."""
     running = True
     print("Starting simulation, please enter your parameters")
     while running:
@@ -182,7 +165,9 @@ def main() -> None:
                 print("Please enter a valid integer.")
     print("Thank you")
 
+
 def run(num_rounds, attacked, defense_strategy, clients_attacked, attack_percentage) -> None:
+    """Run the simulation."""
     # Create dataset partitions (needed if your dataset is not pre-partitioned)
     partitions = [DataPreprocessor([232, 222, 209, 201, 207, 118, 220, 223, 202, 234, 124]).split_data(),
                   DataPreprocessor([100, 200, 213, 210, 114, 219, 233, 113, 108, 101, 205]).split_data(),
@@ -247,13 +232,6 @@ def attack_clients(partitions, attacked_clients, attack_percentage):
 def label_flipping_attack(part, attack_percentage, random_seed=42):
     """
     Apply label flipping attack to a partition.
-
-    Parameters:
-    - partition: Tuple containing (data, labels)
-    - attack_percentage: Percentage of labels to be flipped
-
-    Returns:
-    - partition with labels flipped
     """
 
     np.random.seed(random_seed)

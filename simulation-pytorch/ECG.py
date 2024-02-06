@@ -2,11 +2,12 @@ import numpy as np
 import pywt
 import wfdb
 from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split
 
 
 class DataPreprocessor:
     def __init__(self, utenti):
+        """Initialize DataPreprocessor object."""
         self.utenti = utenti
         self.classi_aritmia = ['e', 'j', 'A', 'a', 'J', 'S', 'V', 'E', 'F']
         self.dataset_folder = "MIT-BIH-DataSet"
@@ -15,6 +16,7 @@ class DataPreprocessor:
         self.process_data()
 
     def process_data(self):
+        """Process ECG data for each user in utenti list."""
         for utente in self.utenti:
             utente = str(utente)
             percorso_file = f"{self.dataset_folder}/{utente}.dat"
@@ -53,6 +55,7 @@ class DataPreprocessor:
         self.labels = np.asarray(self.labels)
 
     def split_data(self):
+        """Split data into training and testing sets, and apply SMOTE on the training set."""
         # Split data into training and testing sets
         x_train, x_test, y_train, y_test = train_test_split(
             self.train_features, self.labels, test_size=0.3, random_state=42
