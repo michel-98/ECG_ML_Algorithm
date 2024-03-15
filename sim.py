@@ -102,44 +102,49 @@ def get_input():
         attacked_input = input("Enter 'True' if attacked, 'False' otherwise: ")
         if attacked_input in ['True', 'False']:
             attacked = (attacked_input == 'True')
-            valid_input_clients = False
-            while not valid_input_clients:
-                try:
-                    clients_attacked = int(input("Enter the number of attacked clients (1-3): "))
-                    if 1 <= clients_attacked <= 3:
-                        if clients_attacked == 1:
-                            attacked_clients = [0]
-                        elif clients_attacked == 2:
-                            attacked_clients = [0, 1]
-                        elif clients_attacked == 3:
-                            attacked_clients = [0, 1, 2]
-                        break
-                    else:
-                        print("Clients attacked must be between 1 and 3.")
-                except ValueError:
-                    print("Please enter a valid integer.")
-            valid_input_defense = False
-            while not valid_input_defense:
-                try:
-                    defense_strategy = int(input("Enter the defense strategy (0 for no defense, 1 for substitution, "
-                                                 "2 for deletion, 3 for data augmentation): "))
-                    if defense_strategy in [0, 1, 2, 3]:
-                        break
-                    else:
-                        print("Defense strategy must be in [0, 1, 2, 3].")
-                except ValueError:
-                    print("Please enter a valid integer.")
-            valid_input_percentage = False
-            while not valid_input_percentage:
-                try:
-                    attacked_percentage = float(input("Enter the attack percentage: "))
-                    if 0 <= attacked_percentage <= 1:
-                        break
-                    else:
-                        print("Attack percentage must be between 0 and 1.")
-                except ValueError:
-                    print("Please enter a valid floating point number.")
-            break
+            if attacked:
+                valid_input_clients = False
+                while not valid_input_clients:
+                    try:
+                        clients_attacked = int(input("Enter the number of attacked clients (1-3): "))
+                        if 1 <= clients_attacked <= 3:
+                            if clients_attacked == 1:
+                                attacked_clients = [0]
+                            elif clients_attacked == 2:
+                                attacked_clients = [0, 1]
+                            elif clients_attacked == 3:
+                                attacked_clients = [0, 1, 2]
+                            break
+                        else:
+                            print("Clients attacked must be between 1 and 3.")
+                    except ValueError:
+                        print("Please enter a valid integer.")
+                valid_input_defense = False
+                while not valid_input_defense:
+                    try:
+                        defense_strategy = int(
+                            input("Enter the defense strategy (0 for no defense, 1 for substitution, "
+                                  "2 for deletion, 3 for data augmentation): "))
+                        if defense_strategy in [0, 1, 2, 3]:
+                            break
+                        else:
+                            print("Defense strategy must be in [0, 1, 2, 3].")
+                    except ValueError:
+                        print("Please enter a valid integer.")
+                valid_input_percentage = False
+                while not valid_input_percentage:
+                    try:
+                        attacked_percentage = float(input("Enter the attack percentage: "))
+                        if 0 <= attacked_percentage <= 1:
+                            break
+                        else:
+                            print("Attack percentage must be between 0 and 1.")
+                    except ValueError:
+                        print("Please enter a valid floating point number.")
+                break
+            else:
+                print("Attacked: ", attacked)
+                break
         else:
             print("Please enter 'True' or 'False'.")
 
@@ -224,7 +229,7 @@ def run(num_rounds, attacked, defense_strategy, clients_attacked, attack_percent
 
 def attack_clients(partitions, attacked_clients, attack_percentage):
     for cid in attacked_clients:
-        # Flip labels for a certain percentage of data in each attacked client
+            # Flip labels for a certain percentage of data in each attacked client
         flipped, modified = label_flipping_attack(partitions[cid], attack_percentage)
         partitions[cid] = flipped
 

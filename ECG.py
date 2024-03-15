@@ -45,8 +45,6 @@ class DataPreprocessor:
                         label = 1
                     elif annotation.symbol[i] == 'F':
                         label = 2
-                    else:
-                        label = 3
 
                     self.train_features.append(feature)
                     self.labels.append(label)
